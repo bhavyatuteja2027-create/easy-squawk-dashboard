@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Easy Squawk Live</title>
+<style>
+:root{--bg:#0E1117;--nav:#0A0D12;--wid:#0F1319;--head:#1A212D;--line:#242C3A;--ink:#F3F5F9;--muted:#8A94A8;--brand:#2FA8FF;--hot:#F59E0B;--hotink:#1A1203;--up:#34D399;--down:#F87171;--off:#B3263E;--on:#1F9D6B}
+*{box-sizing:border-box}html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif;display:grid;grid-template-columns:84px 1fr;overflow:hidden}
+button{font:inherit;color:inherit;cursor:pointer}:focus-visible{outline:2px solid var(--brand);outline-offset:-2px}
+nav{background:var(--nav);border-right:1px solid var(--line);display:flex;flex-direction:column}
+.sqb{border:0;background:var(--off);padding:16px 6px;display:flex;flex-direction:column;align-items:center;gap:6px;font-weight:700;font-size:13px;line-height:1.1}
+.sqb.on{background:var(--on)}.sqb svg{width:24px;height:24px}
+.nv{border:0;background:transparent;color:var(--muted);padding:16px 6px;font-size:13px;border-left:3px solid transparent;text-align:center}
+.nv[aria-current=page]{color:var(--ink);background:var(--head);border-left-color:var(--brand)}
+.logo{margin-top:auto;padding:14px 6px;text-align:center;font-weight:800;font-size:12px;color:var(--muted)}
+.mainp{display:flex;flex-direction:column;min-width:0;min-height:0;height:100vh}
+.bar{display:flex;align-items:center;gap:14px;padding:10px 16px;border-bottom:1px solid var(--line);font-size:13px;color:var(--muted);flex-wrap:wrap}
+.bar b{color:var(--hot)}.bar i{width:8px;height:8px;border-radius:50%;background:var(--hot);display:inline-block;margin-right:6px}
+.bar input{margin-left:auto;background:var(--head);border:1px solid var(--line);border-radius:8px;color:var(--ink);padding:7px 11px;min-width:180px}
+.tabs{display:flex;gap:6px;padding:8px 12px;border-bottom:1px solid var(--line);align-items:center;overflow-x:auto}
+.tab{background:var(--head);border:1px solid var(--line);border-radius:7px;padding:6px 12px;color:var(--muted);white-space:nowrap}
+.tab[aria-selected=true]{color:var(--ink);border-color:var(--brand)}
+.tab.add{background:transparent;border-style:dashed}.tabs .sp{margin-left:auto;display:flex;gap:6px}
+.board{flex:1;min-height:0;display:flex;gap:10px;padding:10px;overflow-x:auto}
+.w{flex:0 0 min(440px,92vw);display:flex;flex-direction:column;background:var(--wid);border:1px solid var(--line);border-radius:8px;min-height:0}
+.wh{display:flex;align-items:center;gap:8px;padding:9px 12px;background:var(--head);border-radius:8px 8px 0 0;font-weight:600;font-size:13px}
+.wh .bd{font-weight:600;font-size:11px;color:var(--hot);border:1px solid var(--hot);border-radius:999px;padding:1px 8px}
+.wh .ic{margin-left:auto;display:flex;gap:2px}.ic button{border:0;background:none;color:var(--muted);padding:3px 8px;font-size:16px;border-radius:5px}.ic button:hover{background:var(--line);color:var(--ink)}
+.wl{flex:1;overflow-y:auto}
+.r{display:grid;grid-template-columns:48px 1fr 22px;gap:10px;padding:10px 12px;border-bottom:1px solid var(--line);align-items:start}
+.r.hot{background:var(--hot);color:var(--hotink)}.r.hot .t{color:var(--hotink)}.r.hot a{color:var(--hotink)}
+.t{font:600 13px ui-monospace,Menlo,monospace;color:var(--ink);padding-top:1px}
+.r a{color:var(--ink);text-decoration:none;font-weight:600;font-size:14.5px}.r a:hover{text-decoration:underline}
+.src{display:block;font-size:11px;font-weight:500;opacity:.65;margin-top:2px}
+.ar{font-weight:700;text-align:center}.ar.up{color:var(--up)}.ar.down{color:var(--down)}.r.hot .ar{color:var(--hotink)}
+.new{animation:fl 3s}@keyframes fl{from{background:#173B4F}}
+.empty{padding:28px 16px;color:var(--muted);text-align:center}
+.page{padding:20px;overflow-y:auto;flex:1;max-width:760px}
+.card{background:var(--wid);border:1px solid var(--line);border-radius:10px;padding:16px;margin-bottom:16px}
+.card h2{margin:0 0 10px;font-size:16px}
+input[type=text],select{background:var(--head);border:1px solid var(--line);border-radius:8px;color:var(--ink);padding:8px 11px;font:inherit;width:100%}
+.row{display:flex;gap:8px}.btn{background:var(--brand);color:#04121F;border:0;border-radius:8px;padding:8px 14px;font-weight:700}
+.btn.g{background:transparent;color:var(--ink);border:1px solid var(--line);font-weight:500}
+.kw{display:inline-flex;align-items:center;background:var(--head);border:1px solid var(--line);border-radius:999px;padding:3px 4px 3px 11px;margin:8px 6px 0 0;font-weight:600}.kw button{border:0;background:none;color:var(--muted);padding:0 6px;font-size:15px}
+.chk{display:flex;gap:8px;align-items:center;margin-top:12px;color:var(--muted)}
+dialog{background:var(--wid);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:18px;width:min(380px,92vw)}dialog::backdrop{background:#000a}
+dialog label{display:block;font-size:12px;color:var(--muted);margin:10px 0 4px}
+.foot{padding:6px 16px;font-size:11px;color:var(--muted);border-top:1px solid var(--line)}
+@media (max-width:760px){body{grid-template-columns:1fr;grid-template-rows:auto 1fr}nav{flex-direction:row;border-right:0;border-bottom:1px solid var(--line)}.sqb{flex-direction:row;padding:10px 14px}.logo{display:none}.nv{padding:10px 14px;border-left:0}.mainp{height:auto}.board{flex-direction:column;overflow:visible}.w{flex:none;height:70vh}body{overflow:auto}}
+</style>
+</head>
+<body>
+<nav aria-label="Main">
+  <button class="sqb" id="sq" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H2v6h4l5 4z"/><path id="wv" d="M16 9l5 6M21 9l-5 6"/></svg><span id="sqt">Start Squawk</span></button>
+  <button class="nv" data-v="dash" aria-current="page">Dashboard</button>
+  <button class="nv" data-v="watch">Watchlists</button>
+  <div class="logo">Easy<br>Squawk</div>
+</nav>
+<div class="mainp">
+  <div class="bar"><span><i></i><b>OPEN DATA</b></span><span id="stat">Connecting...</span><input type="search" id="q" placeholder="Search all widgets" aria-label="Search headlines"></div>
+  <div id="dash" style="display:flex;flex-direction:column;flex:1;min-height:0">
+    <div class="tabs" id="tabs" role="tablist"></div>
+    <div class="board" id="board"></div>
+  </div>
+  <div class="page" id="watch" style="display:none">
+    <div class="card"><h2>Alert keywords</h2>
+      <div class="row"><input type="text" id="kw" placeholder="Add a ticker, company or topic, e.g. NVDA, Powell, oil" aria-label="Add keyword"><button class="btn" id="addKw">Add</button></div>
+      <div id="kws"></div>
+      <label class="chk"><input type="checkbox" id="all"> Squawk reads every new headline, not just highlighted ones</label>
+      <p class="chk" style="margin-bottom:0">Highlighted rows are keyword matches or headlines with a strong sentiment score.</p>
+    </div>
+    <div class="card"><h2>Headlines matching your keywords</h2><div id="hits"></div></div>
+  </div>
+  <div class="foot">Headlines from official and public feeds, linked to the publisher. Refreshes about every 10 minutes. Sentiment is a keyword estimate, not investment advice.</div>
+</div>
+<dialog id="dlg"><h2 style="margin:0 0 4px;font-size:16px" id="dt">Widget</h2>
+  <label for="wn">Name</label><input type="text" id="wn" maxlength="30">
+  <label for="wc">Category</label><select id="wc"></select>
+  <label for="ws">Source</label><select id="ws"></select>
+  <label for="wk">Headline contains</label><input type="text" id="wk" maxlength="30" placeholder="optional">
+  <div class="row" style="margin-top:16px;justify-content:flex-end"><button class="btn g" id="wx">Cancel</button><button class="btn" id="wo">Save</button></div>
+</dialog>
+<script>
+const $=s=>document.querySelector(s),el=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e};
+const store={get(k,d){try{const v=JSON.parse(localStorage.getItem(k));return v==null?d:v}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const CATS=['Macro','Central Banks','Equities','FX','Commodities','Crypto','World','Filings'],uid=()=>Math.random().toString(36).slice(2,8);
+const DEF={active:'t1',tabs:[{id:'t1',name:'Dashboard',widgets:[{id:'a',title:'Headlines',cat:'',src:'',kw:''},{id:'b',title:'Central banks',cat:'Central Banks',src:'',kw:''},{id:'c',title:'SEC filings',cat:'Filings',src:'',kw:''},{id:'d',title:'World events',cat:'World',src:'',kw:''}]}]};
+let D=store.get('es_dash',DEF),kws=store.get('es_kw',['Fed','oil']),items=[],seen=null,fresh=new Set(),sq=false,editing=null,scr={};
+const save=()=>store.set('es_dash',D),tab=()=>D.tabs.find(t=>t.id===D.active)||D.tabs[0];
+const hit=t=>kws.some(k=>new RegExp('\\b'+k.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'\\b','i').test(t));
+const hot=i=>hit(i.title)||Math.abs(i.score)>=.5;
+const hhmm=ts=>new Date(ts*1000).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',hour12:false});
+const ago=ts=>{const m=Math.max(0,Math.round((Date.now()/1000-ts)/60));return m<1?'now':m<60?m+'m':Math.round(m/60)+'h'};
+const safe=u=>/^https?:\/\//i.test(u)?u:'#';
+function chime(){try{const a=new(window.AudioContext||window.webkitAudioContext)(),t=a.currentTime;[660,880].forEach((f,i)=>{const o=a.createOscillator(),g=a.createGain();o.frequency.value=f;o.connect(g);g.connect(a.destination);g.gain.setValueAtTime(.15,t+i*.15);g.gain.exponentialRampToValueAtTime(.001,t+i*.15+.14);o.start(t+i*.15);o.stop(t+i*.15+.15)})}catch(e){}}
+function speak(list){if(!sq||!window.speechSynthesis)return;const p=($('#all').checked?list:list.filter(hot)).slice(0,3);if(!p.length)return;chime();p.forEach(i=>speechSynthesis.speak(new SpeechSynthesisUtterance(i.cat+'. '+i.title)))}
+function filt(w){const q=$('#q').value.toLowerCase(),k=(w.kw||'').toLowerCase();return items.filter(i=>(!w.cat||i.cat===w.cat)&&(!w.src||i.source===w.src)&&(!k||i.title.toLowerCase().includes(k))&&(!q||i.title.toLowerCase().includes(q))).slice(0,120)}
+function row(i){const r=el('div','r'+(hot(i)?' hot':'')+(fresh.has(i.id)?' new':'')),d=el('div'),a=el('a','',i.title);a.href=safe(i.url);a.target='_blank';a.rel='noopener noreferrer';d.append(a,el('span','src',i.source+' · '+i.cat));
+  r.append(el('span','t',hhmm(i.ts)),d,el('span','ar '+(i.score>.15?'up':i.score<-.15?'down':''),i.score>.15?'↑':i.score<-.15?'↓':''));return r}
+function drawTabs(){const t=$('#tabs');t.textContent='';D.tabs.forEach(x=>{const b=el('button','tab',x.name);b.setAttribute('role','tab');b.setAttribute('aria-selected',String(x.id===D.active));b.onclick=()=>{D.active=x.id;save();draw()};t.appendChild(b)});
+  const a=el('button','tab add','+ Add tab');a.onclick=()=>{const n=prompt('Tab name');if(n){const id=uid();D.tabs.push({id,name:n.slice(0,24),widgets:[]});D.active=id;save();draw()}};t.appendChild(a);
+  const sp=el('div','sp'),aw=el('button','tab','+ Add widget');aw.onclick=()=>openDlg(null);sp.appendChild(aw);
+  if(D.tabs.length>1){const dt=el('button','tab','Delete tab');dt.onclick=()=>{if(confirm('Delete this tab?')){D.tabs=D.tabs.filter(x=>x.id!==D.active);D.active=D.tabs[0].id;save();draw()}};sp.appendChild(dt)}t.appendChild(sp)}
+function drawBoard(){document.querySelectorAll('.wl').forEach(n=>scr[n.dataset.id]=n.scrollTop);const b=$('#board');b.textContent='';const ws=tab().widgets;
+  if(!ws.length)b.appendChild(el('div','empty','No widgets in this tab. Use "+ Add widget".'));
+  ws.forEach(w=>{const d=el('section','w'),h=el('div','wh');h.append(el('span','',w.title),el('span','bd','10-min refresh'));
+    const ic=el('div','ic'),e=el('button','','⚙'),x=el('button','','×');e.title='Edit';e.setAttribute('aria-label','Edit '+w.title);x.title='Remove';x.setAttribute('aria-label','Remove '+w.title);
+    e.onclick=()=>openDlg(w);x.onclick=()=>{tab().widgets=tab().widgets.filter(y=>y.id!==w.id);save();draw()};ic.append(e,x);h.appendChild(ic);
+    const l=el('div','wl');l.dataset.id=w.id;const list=filt(w);if(!list.length)l.appendChild(el('div','empty',items.length?'Nothing matches this widget.':'No data yet. Run the update workflow once.'));list.forEach(i=>l.appendChild(row(i)));
+    d.append(h,l);b.appendChild(d);l.scrollTop=scr[w.id]||0})}
+function drawWatch(){const k=$('#kws');k.textContent='';kws.forEach(w=>{const c=el('span','kw',w),b=el('button','','×');b.setAttribute('aria-label','Remove '+w);b.onclick=()=>{kws=kws.filter(x=>x!==w);store.set('es_kw',kws);draw()};c.appendChild(b);k.appendChild(c)});
+  const h=$('#hits');h.textContent='';const l=items.filter(i=>hit(i.title)).slice(0,60);if(!l.length)h.appendChild(el('div','empty','No matches yet.'));l.forEach(i=>h.appendChild(row(i)))}
+function draw(){drawTabs();drawBoard();drawWatch()}
+function openDlg(w){editing=w;$('#dt').textContent=w?'Edit widget':'Add widget';$('#wn').value=w?w.title:'';$('#wk').value=w?w.kw:'';
+  const c=$('#wc');c.textContent='';c.appendChild(new Option('All categories',''));CATS.forEach(n=>c.appendChild(new Option(n,n)));c.value=w?w.cat:'';
+  const s=$('#ws');s.textContent='';s.appendChild(new Option('All sources',''));[...new Set(items.map(i=>i.source))].sort().forEach(n=>s.appendChild(new Option(n,n)));s.value=w?w.src:'';$('#dlg').showModal()}
+$('#wo').onclick=()=>{const v={title:$('#wn').value.trim()||'Widget',cat:$('#wc').value,src:$('#ws').value,kw:$('#wk').value.trim()};if(editing)Object.assign(editing,v);else tab().widgets.push({id:uid(),...v});save();$('#dlg').close();draw()};
+$('#wx').onclick=()=>$('#dlg').close();
+document.querySelectorAll('.nv').forEach(b=>b.onclick=()=>{document.querySelectorAll('.nv').forEach(x=>x.removeAttribute('aria-current'));b.setAttribute('aria-current','page');const d=b.dataset.v==='dash';$('#dash').style.display=d?'flex':'none';$('#watch').style.display=d?'none':'block'});
+$('#sq').onclick=()=>{sq=!sq;$('#sq').classList.toggle('on',sq);$('#sq').setAttribute('aria-pressed',String(sq));$('#sqt').textContent=sq?'Squawk on':'Start Squawk';$('#wv').setAttribute('d',sq?'M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13':'M16 9l5 6M21 9l-5 6');if(sq)chime()};
+$('#addKw').onclick=()=>{const v=$('#kw').value.trim().slice(0,30);if(v&&!kws.includes(v)){kws.push(v);store.set('es_kw',kws);draw()}$('#kw').value=''};
+$('#kw').addEventListener('keydown',e=>{if(e.key==='Enter')$('#addKw').click()});$('#q').oninput=drawBoard;
+async function load(){try{const r=await fetch('data/feed.json?t='+Date.now(),{cache:'no-store'});if(!r.ok)throw 0;const j=await r.json();items=j.items||[];
+  if(seen){const nw=items.filter(i=>!seen.has(i.id));fresh=new Set(nw.map(i=>i.id));speak(nw)}seen=new Set(items.map(i=>i.id));
+  $('#stat').textContent=items.length+' headlines · updated '+ago(j.updated)+' ago'+(j.errors&&j.errors.length?' · '+j.errors.length+' source(s) failed':'')}
+  catch(e){$('#stat').textContent='No data found (data/feed.json)'}draw()}
+draw();load();setInterval(load,60000);
+</script>
+</body>
+</html>
